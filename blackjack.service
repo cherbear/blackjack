@@ -1,0 +1,16 @@
+[Unit]
+Description=Blackjack
+
+[Service]
+Type=simple
+User=blackjack
+Group=blackjack
+Restart=on-failure
+Environment=MIX_ENV=prod "PORT=4793"
+Environment=LANG=en_US.UTF-8
+
+WorkingDirectory=/home/blackjack/blackjack
+ExecStart=/home/blackjack/blackjack/start.sh
+
+[Install]
+WantedBy=multi-user.target

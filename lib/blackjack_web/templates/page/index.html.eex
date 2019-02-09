@@ -1,0 +1,18 @@
+<div class="row">
+  <div class="column">
+    <h1>Join a Blackjack Game</h1>
+    
+    <%= form_for @conn, "/game", fn f-> %>
+      <p> Enter Name of Game: <%= text_input f, :name, placeholder: "cs4550" %></p>
+      <p><%= submit "Join Game" %></p>
+    <% end %>
+    
+    <!--
+    <div class="join-game">
+      <p>Enter the name of the game you want to join:
+      <input type="text" id="game-name">
+      <a href="/game/:name"><input type="submit" id="join-game" value="Join Game"></a></p>
+    </div>
+    -->
+  </div>
+</div
