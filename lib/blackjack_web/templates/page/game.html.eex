@@ -3,7 +3,7 @@
 </script>
 <div class="row">
   <div class="column">
-    <h1>Blackjack Game <%= @name %></h1>
+    <h1>Blackjack Game: <%= @name %></h1>
     <div id="root">
       React component loading...
     </div>

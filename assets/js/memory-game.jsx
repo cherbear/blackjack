@@ -10,16 +10,9 @@ class MemoryGame extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      board: [],
-      letters: [],
-      correct: [],
-      name: "",
+      hand: ["3C", "8D"],
       win: false,
       clickable: true,
-      clicks: 0,
-      score: 0,
-      i: -1,
-      j: -1
     };
     this.name = props.name
     this.channel = props.channel
@@ -29,69 +22,54 @@ class MemoryGame extends React.Component {
   }
 
   resetGame() {
+    console.log("Reset Game Pressed")
     this.channel.push("new", {name: this.state.name}).receive("ok", this.updateState.bind(this))
   }
 
-  cardClicked(index) {
+  hit() {
+    console.log("Hit Pressed")
     if(this.state.clickable) {
-      this.channel.push("click", {index: index}).receive("ok", this.updateState.bind(this))
+      this.channel.push("hit").receive("ok", this.updateState.bind(this))
     }
   }
-  
-  updateState(state) {
-    console.log("----Update----")
-    if(!state.game.clickable) {
-      setTimeout(() => {
-	var tempBoard = state.game.board
-	tempBoard[state.game.i] = "-"
-	tempBoard[state.game.j] = "-"
-	this.channel.push("update", {
-		board: tempBoard,
-		correct: state.game.correct,
-		name: state.game.name,
-		win: state.game.win,
-		clickable: state.game.clickable,
-		clicks: state.game.clicks,
-		score: state.game.score,
-		i: state.game.i,
-		j: state.game.j,
-	})
-	.receive("ok", resp => {console.log("Updated game", resp) })
-	this.setState({
-	  board: tempBoard,
-	  clickable: true,
-	})
-      }, 1000);
+
+  stand() {
+    console.log("Stand Pressed")
+    if(this.state.clickable) {
+      this.channel.push("stand").receive("ok", this.updateState.bind(this))
     }
-    this.setState(state.game)
   }
-  
+
+  updateState() {
+    console.log("Update State")
+  }
   render() {
-    let scoreMessage = "Clicks: " + this.state.clicks + "      Score: " + this.state.score;
+    let turnMessage = "Player X's Turn";
     if (this.state.win) {
-      scoreMessage = "You win! Number of Clicks: [" + this.state.clicks + "]     Score: [" + this.state.score + "]";
+      turnMessage = "Player X Won this Round!";
     }
     return(
-	<div className="MemoryGame">
-	  <div className="score">
-	    {scoreMessage}
+	<div className="BlackjackGame">
+	  <div className="turn">
+	    {turnMessage}
 	  </div>
+    <div className="buttons">
+      <div className="col">
+        <button className="hit" name="Hit" onClick={() => this.hit()}>Hit</button>
+        &nbsp;
+        <button className="stand" name="Stand" onClick={() => this.stand()}>Stand</button>
+      </div>
+    </div>
+    <div className="row">
+	    <div className="P1-hand">
+        {this.state.hand.map((c) => {return <div className="P1-card">{c}</div>})}
+	    </div>
+	    <div className="P2-hand">
+        {this.state.hand.map((c) => {return <div className="P2-card">{c}</div>})}
+	    </div>
+    </div>
 	  <div className="reset">
 	    <button className="reset-button" name="Reset" onClick={() => this.resetGame()}>Reset Game</button>
-	  </div>
-	  <div className="board">
-	    <div className="row">
-	    {this.state.board.slice(0, 4).map((c, i) => {return <div className="Card-Back" onClick={() => this.cardClicked(i)}>{c}</div>})}
-	    </div>
-	    <div className="row">
-	    {this.state.board.slice(4, 8).map((c, i) => {return <div className="Card-Back" onClick={() => this.cardClicked(i)}>{c}</div>})}
-	    </div>
-	    <div className="row">
-	    {this.state.board.slice(8, 12).map((c, i) => {return <div className="Card-Back" onClick={() => this.cardClicked(i)}>{c}</div>})}
-	    </div>
-	    <div className="row">
-	    {this.state.board.slice(12, 16).map((c, i) => {return <div className="Card-Back" onClick={() => this.cardClicked(i)}>{c}</div>})}
-	    </div>
 	  </div>
 	</div>
     );

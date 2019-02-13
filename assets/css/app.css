@@ -7,11 +7,24 @@
     text-align: center;
 }
 
-.Card-Face {
+.P1-card {
     font-family: Monospace;
     font-size: 50px;
     text-align: center;
-    color: green;
+    color: blue;
+    width: 100px;
+    height: 100px;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.P2-card {
+    font-family: Monospace;
+    font-size: 50px;
+    text-align: center;
+    color: red;
     width: 100px;
     height: 100px;
     border-width: medium;
