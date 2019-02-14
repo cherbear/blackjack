@@ -15,25 +15,32 @@ defmodule BlackjackWeb.GamesChannel do
     end
   end
 
-  def handle_in("click", payload, socket) do
-    game = Game.cardClicked(socket.assigns[:game], payload["index"])
+  def handle_in("hit", payload, socket) do
+    game = Game.hit(socket.assigns[:game])
     Blackjack.BackupAgent.put(socket.assigns[:name], game)
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
+  def handle_in("stand", payload, socket) do
+    game = Game.stand(socket.assigns[:game])
+    Blackjack.BackupAgent.put(socket.assigns[:name], game)
+    socket = assign(socket, :game, game)
+    {:reply, {:ok, %{"game" => game}}, socket}
+  end
+  
   def handle_in("update", payload, socket) do
     game = %{
-      board: payload["board"],
-      letters: payload["letters"],
-      correct: payload["correct"],
+      player1: payload["player1"],
+      player1Sum: payload["player1Sum"],
+      player1Score: payload["player1Score"],
+      player2: payload["player2"],
+      player2Sum: payload["player2Sum"],
+      player2Score: payload["player2Score"],
+      playerTurn: payload["playerTurn"],
+      round: payload["round"],
       name: payload["name"],
       win: payload["win"],
-      clickable: payload["clickable"],
-      click: payload["click"],
-      score: payload["score"],
-      i: payload["i"],
-      j: payload["j"]
     }
     Blackjack.BackupAgent.put(socket.assigns[:name], game)
     socket = assign(socket, :game, game)

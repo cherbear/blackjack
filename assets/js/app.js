@@ -16,7 +16,7 @@ import $ from "jquery";
 //
 // Local files can be imported directly using relative paths, for example:
 import socket from "./socket"
-import game_init from "./memory-game";
+import game_init from "./blackjack";
 
 // Now that you are connected, you can join channels with a topic:
 function start() {

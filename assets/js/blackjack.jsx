@@ -10,9 +10,15 @@ class MemoryGame extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      hand: ["3C", "8D"],
+      playerTurn: 1,
+      player1: [],
+      player1Sum: 0,
+      player1Score: 0,
+      player2: [],
+      player2Sum: 0,
+      player2Score: 0,
       win: false,
-      clickable: true,
+      round: 1,
     };
     this.name = props.name
     this.channel = props.channel
@@ -28,31 +34,41 @@ class MemoryGame extends React.Component {
 
   hit() {
     console.log("Hit Pressed")
-    if(this.state.clickable) {
-      this.channel.push("hit").receive("ok", this.updateState.bind(this))
-    }
+    this.channel.push("hit").receive("ok", this.updateState.bind(this))
   }
 
   stand() {
     console.log("Stand Pressed")
-    if(this.state.clickable) {
-      this.channel.push("stand").receive("ok", this.updateState.bind(this))
-    }
+    this.channel.push("stand").receive("ok", this.updateState.bind(this))
   }
 
-  updateState() {
+  updateState(state) {
     console.log("Update State")
+    console.log(state.game.playerTurn)
+    console.log(state.game.player1)
+    console.log(state.game.player1Sum)
+    console.log(state.game.player2)
+    console.log(state.game.player2Sum)
+    this.setState(state.game);
   }
   render() {
-    let turnMessage = "Player X's Turn";
+    let turnMessage = "Player " + this.state.playerTurn + "'s Turn";
     if (this.state.win) {
       turnMessage = "Player X Won this Round!";
     }
+    let roundMessage = "Round: " + this.state.round;
+    let scoreMessage = "Player 1 Score: " + this.state.player1Score + "    ||    " + "Player 2 Score: " + this.state.player2Score
     return(
 	<div className="BlackjackGame">
+    <div className="round">
+      {roundMessage}
+    </div>
 	  <div className="turn">
 	    {turnMessage}
 	  </div>
+    <div className="score">
+      {scoreMessage}
+    </div>
     <div className="buttons">
       <div className="col">
         <button className="hit" name="Hit" onClick={() => this.hit()}>Hit</button>
@@ -62,10 +78,12 @@ class MemoryGame extends React.Component {
     </div>
     <div className="row">
 	    <div className="P1-hand">
-        {this.state.hand.map((c) => {return <div className="P1-card">{c}</div>})}
+        {this.state.player1.map((c) => {return <span className="P1-card">{c}</span>})}
+        <p>Player 1</p>
 	    </div>
 	    <div className="P2-hand">
-        {this.state.hand.map((c) => {return <div className="P2-card">{c}</div>})}
+        {this.state.player2.map((c) => {return <span className="P2-card">{c}</span>})}
+        <p>Player 2</p>
 	    </div>
     </div>
 	  <div className="reset">

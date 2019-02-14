@@ -7,6 +7,28 @@
     text-align: center;
 }
 
+.P1-hand {
+    font-family: Monospace;
+    font-size: 50px;
+    text-align: center;
+    color: blue;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.P2-hand {
+    font-family: Monospace;
+    font-size: 50px;
+    text-align: center;
+    color: red;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
 .P1-card {
     font-family: Monospace;
     font-size: 50px;
