@@ -17,7 +17,7 @@ defmodule BlackjackWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    get "/game/:name", PageController, :game
+    get "/game/:game", PageController, :game
     post "/game", PageController, :game_form
   end
 

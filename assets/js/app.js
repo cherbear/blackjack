@@ -22,7 +22,7 @@ import game_init from "./blackjack";
 function start() {
   let root = document.getElementById('root');
   if (root) {
-    let channel = socket.channel("games:" + window.gameName, {});
+    let channel = socket.channel("games:" + window.gameName, {user: window.userName});
     // We want to join in the react component.
     game_init(root, channel);
   }

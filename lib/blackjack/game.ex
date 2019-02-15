@@ -21,11 +21,11 @@ defmodule Blackjack.Game do
         deck: tempDeck,
         discard: [p1Card1] ++ [p2Card2] ++ [p1Card2] ++ [p2Card2],
         player1: tempPlayer1,
-        player1Name: "",
+        player1Name: "Player1",
         player1Sum: tempPlayer1Sum,
         player1Score: 0,
         player2: tempPlayer2,
-        player2Name: "",
+        player2Name: "Player2",
         player2Sum: tempPlayer2Sum,
         player2Score: 0,
         playerTurn: 1,
@@ -36,7 +36,7 @@ defmodule Blackjack.Game do
   end
 
   def newRound(state, p1Score, p2Score) do
-    deck = Enum.shuffle(state.deck ++ state.player1 ++ state.player2)
+    deck = Enum.shuffle(state.deck ++ state.discard)
     p1Card1 = elem(List.pop_at(deck, 0), 0)
     p1Card2 = elem(List.pop_at(deck, 2), 0)
     p2Card1 = elem(List.pop_at(deck, 1), 0)
@@ -50,11 +50,11 @@ defmodule Blackjack.Game do
         deck: tempDeck,
         discard: [p1Card1] ++ [p2Card2] ++ [p1Card2] ++ [p2Card2],
         player1: tempPlayer1,
-        player1Name: "",
+        player1Name: "Player1",
         player1Sum: tempPlayer1Sum,
         player1Score: p1Score,
         player2: tempPlayer2,
-        player2Name: "",
+        player2Name: "Player2",
         player2Sum: tempPlayer2Sum,
         player2Score: p2Score,
         playerTurn: 1,
@@ -68,7 +68,7 @@ defmodule Blackjack.Game do
     if length(pList) != 0 do
       val = String.first(List.first(pList))
       cond do
-        val == "A" -> 1 + calcHand(tl(pList))
+        val == "A" -> 11 + calcHand(tl(pList))
         val == "0" || val == "J" || val == "Q" || val == "K" -> 10 + calcHand(tl(pList))
         true -> elem(Integer.parse(val), 0) + calcHand(tl(pList))
       end
@@ -144,6 +144,7 @@ defmodule Blackjack.Game do
   def calcScores(state) do
     if state.playerTurn == 2  do
       cond do
+        state.player1Sum > 21 && state.player2Sum > 21 -> {state.player1Score, state.player2Score, true}
         state.player1Sum > 21 && state.player2Sum < 21 -> {state.player1Score, state.player2Score + 1, true}
         state.player2Sum > 21 && state.player1Sum < 21 -> {state.player1Score + 1, state.player2Score, true}
         state.player1Sum > state.player2Sum -> {state.player1Score + 1, state.player2Score, true}
@@ -158,6 +159,7 @@ defmodule Blackjack.Game do
 
   def stand(state) do
     IO.puts("Stand!")
+    IO.inspect(state)
     tempPlayerTurn = nextTurn(state.playerTurn)
     scores = calcScores(state)
     p1Score = elem(scores, 0)

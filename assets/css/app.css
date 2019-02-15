@@ -11,7 +11,18 @@
     font-family: Monospace;
     font-size: 50px;
     text-align: center;
-    color: blue;
+    color: black;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.P1-hand-turn {
+    font-family: Monospace;
+    font-size: 50px;
+    text-align: center;
+    color: green;
     border-width: medium;
     border-style: solid;
     padding: 2px;
@@ -22,7 +33,18 @@
     font-family: Monospace;
     font-size: 50px;
     text-align: center;
-    color: red;
+    color: black;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.P2-hand-turn {
+    font-family: Monospace;
+    font-size: 50px;
+    text-align: center;
+    color: green;
     border-width: medium;
     border-style: solid;
     padding: 2px;
@@ -66,4 +88,12 @@
     border-style: solid;
     padding: 2px;
     margin: 2px;
+}
+
+.score {
+    font-size: 25px;
+}
+
+.player-name {
+    margin-bottom: 0px;
 }

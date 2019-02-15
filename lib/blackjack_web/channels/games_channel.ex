@@ -3,38 +3,45 @@ defmodule BlackjackWeb.GamesChannel do
   alias Blackjack.Game
   alias Blackjack.BackupAgent
 
-  def join("games:" <> name, payload, socket) do
-    if authorized?(payload) do
-      game = Blackjack.BackupAgent.get(name) || Game.new(name)
+  def join("games:" <> game_name, %{"user" => user}, socket) do
+    IO.puts("NAME #{user}")
+    if authorized?(user) do
+      #IO.puts(BackupAgent.get(game_name))
+      game = BackupAgent.get(game_name) || Game.new(game_name)
       socket = socket
-      |> assign(:game, game)
-      |> assign(:name, name)
-      {:ok, %{"join" => name, "game" => game}, socket}
+      |> assign(:game, game_name)
+      |> assign(:user, user)
+      BackupAgent.put(game_name, game)
+      {:ok, %{"join" => game_name, "game" => game}, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
   end
 
   def handle_in("hit", payload, socket) do
-    game = Game.hit(socket.assigns[:game])
-    Blackjack.BackupAgent.put(socket.assigns[:name], game)
-    socket = assign(socket, :game, game)
+    game_name = socket.assigns[:game]
+    game = BackupAgent.get(game_name)
+    |> Game.hit
+    BackupAgent.put(game_name, game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
   def handle_in("stand", payload, socket) do
-    game = Game.stand(socket.assigns[:game])
-    Blackjack.BackupAgent.put(socket.assigns[:name], game)
-    socket = assign(socket, :game, game)
+    game_name = socket.assigns[:game]
+    game = BackupAgent.get(game_name)
+    |> Game.stand
+    BackupAgent.put(game_name, game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
   
   def handle_in("update", payload, socket) do
     game = %{
       player1: payload["player1"],
+      player1Name: payload["player1Name"],
       player1Sum: payload["player1Sum"],
       player1Score: payload["player1Score"],
       player2: payload["player2"],
+      player2Name: payload["player2Name"],
       player2Sum: payload["player2Sum"],
       player2Score: payload["player2Score"],
       playerTurn: payload["playerTurn"],
@@ -42,16 +49,16 @@ defmodule BlackjackWeb.GamesChannel do
       name: payload["name"],
       win: payload["win"],
     }
-    Blackjack.BackupAgent.put(socket.assigns[:name], game)
+    BackupAgent.put(socket.assigns[:game], game)
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
   def handle_in("new", payload, socket) do
-    game = Game.new(payload["name"])
-    Blackjack.BackupAgent.put(socket.assigns[:name], game)
-    socket = socket
-    |> assign(:game, game)
+    game_name = socket.assigns[:game]
+    game = BackupAgent.get(game_name)
+    |> Game.new
+    BackupAgent.put(game_name, game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
