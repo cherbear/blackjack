@@ -7,6 +7,94 @@
     text-align: center;
 }
 
+.prev-P1-hand-bust {
+    font-family: Monospace;
+    font-size: 25px;
+    text-align: center;
+    color: crimson;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.prev-P2-hand-bust {
+    font-family: Monospace;
+    font-size: 25px;
+    text-align: center;
+    color: crimson;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.prev-P1-hand-tie {
+    font-family: Monospace;
+    font-size: 25px;
+    text-align: center;
+    color: yellow;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.prev-P2-hand-tie {
+    font-family: Monospace;
+    font-size: 25px;
+    text-align: center;
+    color: yellow;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.prev-P1-hand-win {
+    font-family: Monospace;
+    font-size: 25px;
+    text-align: center;
+    color: lightgreen;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.prev-P2-hand-win {
+    font-family: Monospace;
+    font-size: 25px;
+    text-align: center;
+    color: lightgreen;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.prev-P1-hand {
+    font-family: Monospace;
+    font-size: 25px;
+    text-align: center;
+    color: gray;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
+.prev-P2-hand {
+    font-family: Monospace;
+    font-size: 25px;
+    text-align: center;
+    color: gray;
+    border-width: medium;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+
 .P1-hand {
     font-family: Monospace;
     font-size: 50px;

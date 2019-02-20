@@ -77,59 +77,116 @@ defmodule Blackjack.Game do
     end
   end
 
+  def findAce(hand, index) do
+    cond do
+      length(hand) == 0 -> {-1, "-1"}
+      String.contains?(List.first(hand), "A") -> {index, String.slice(List.first(hand), 1, 1)}
+      true -> findAce(tl(hand), index + 1)
+    end
+  end
+
   def hit(state) do
-    newCard = elem(List.pop_at(state.deck, 0), 0)
-    tempDeck = elem(List.pop_at(state.deck, 0), 1)
-    tempDiscard = state.discard ++ [newCard]
     if state.playerTurn == 1 do
       IO.puts(state.player1)
       if state.player1Sum > 21 do
-        stand(state)
+        if elem(findAce(state.player1, 0), 0) != -1 do
+          aceIndex = findAce(state.player1, 0)
+          newPlayer1 = List.replace_at(state.player1, elem(aceIndex, 0), Enum.join(["1", elem(aceIndex, 1)], ""))
+          totalPlayer1 = calcHand(newPlayer1)
+          newState = %{
+            deck: state.deck,
+            discard: state.discard,
+            player1: newPlayer1,
+            player1Name: state.player1Name,
+            player1Sum: totalPlayer1,
+            player1Score: state.player1Score,
+            player2: state.player2,
+            player2Name: state.player2Name,
+            player2Sum: state.player2Sum,
+            player2Score: state.player2Score,
+            playerTurn: state.playerTurn,
+            round: state.round,
+            win: state.win,
+            name: state.name,
+          }
+          hit(newState)
+        else
+          stand(state)
+        end
       else
-      tempPlayer1 = state.player1 ++ [newCard]
-      totalPlayer1 = calcHand(tempPlayer1)
-      IO.puts("Hit!")
-      %{
-        deck: tempDeck,
-        discard: tempDiscard,
-        player1: tempPlayer1,
-        player1Name: state.player1Name,
-        player1Sum: totalPlayer1,
-        player1Score: state.player1Score,
-        player2: state.player2,
-        player2Name: state.player2Name,
-        player2Sum: state.player2Sum,
-        player2Score: state.player2Score,
-        playerTurn: state.playerTurn,
-        round: state.round,
-        win: state.win,
-        name: state.name,
-      }
+        newCard = elem(List.pop_at(state.deck, 0), 0)
+        tempDeck = elem(List.pop_at(state.deck, 0), 1)
+        tempDiscard = state.discard ++ [newCard]
+        tempPlayer1 = state.player1 ++ [newCard]
+        totalPlayer1 = calcHand(tempPlayer1)
+        IO.puts("Hit!")
+        %{
+          deck: tempDeck,
+          discard: tempDiscard,
+          player1: tempPlayer1,
+          player1Name: state.player1Name,
+          player1Sum: totalPlayer1,
+          player1Score: state.player1Score,
+          player2: state.player2,
+          player2Name: state.player2Name,
+          player2Sum: state.player2Sum,
+          player2Score: state.player2Score,
+          playerTurn: state.playerTurn,
+          round: state.round,
+          win: state.win,
+          name: state.name,
+        }
       end
     else
       IO.puts(state.player2)
       if state.player2Sum > 21 do
-        stand(state)
+        if elem(findAce(state.player2, 0), 0) != -1 do
+          aceIndex = findAce(state.player2, 0)
+          newPlayer2 = List.replace_at(state.player2, elem(aceIndex, 0), Enum.join(["1", elem(aceIndex, 1)], ""))
+          totalPlayer2 = calcHand(newPlayer2)
+          newState = %{
+            deck: state.deck,
+            discard: state.discard,
+            player1: state.player1,
+            player1Name: state.player1Name,
+            player1Sum: state.player1Sum,
+            player1Score: state.player1Score,
+            player2: newPlayer2,
+            player2Name: state.player2Name,
+            player2Sum: totalPlayer2,
+            player2Score: state.player2Score,
+            playerTurn: state.playerTurn,
+            round: state.round,
+            win: state.win,
+            name: state.name,
+          }
+          hit(newState)
+        else
+          stand(state)
+        end
       else
-      tempPlayer2 = state.player2 ++ [newCard]
-      totalPlayer2 = calcHand(tempPlayer2)
-      IO.puts("Hit!")
-      %{
-        deck: tempDeck,
-        discard: tempDiscard,
-        player1: state.player1,
-        player1Name: state.player1Name,
-        player1Sum: state.player1Sum,
-        player1Score: state.player1Score,
-        player2: tempPlayer2,
-        player2Name: state.player2Name,
-        player2Sum: totalPlayer2,
-        player2Score: state.player2Score,
-        playerTurn: state.playerTurn,
-        round: state.round,
-        win: state.win,
-        name: state.name,
-      }
+        newCard = elem(List.pop_at(state.deck, 0), 0)
+        tempDeck = elem(List.pop_at(state.deck, 0), 1)
+        tempDiscard = state.discard ++ [newCard]
+        tempPlayer2 = state.player2 ++ [newCard]
+        totalPlayer2 = calcHand(tempPlayer2)
+        IO.puts("Hit!")
+        %{
+          deck: tempDeck,
+          discard: tempDiscard,
+          player1: state.player1,
+          player1Name: state.player1Name,
+          player1Sum: state.player1Sum,
+          player1Score: state.player1Score,
+          player2: tempPlayer2,
+          player2Name: state.player2Name,
+          player2Sum: totalPlayer2,
+          player2Score: state.player2Score,
+          playerTurn: state.playerTurn,
+          round: state.round,
+          win: state.win,
+          name: state.name,
+        }
       end
     end
   end
@@ -158,6 +215,13 @@ defmodule Blackjack.Game do
   end
 
   def stand(state) do
+    if((state.player1Sum > 21) && (elem(findAce(state.player1, 0), 0) != -1)) do
+      IO.puts("do stuff1")
+    else
+      if ((state.player2Sum > 21) && (elem(findAce(state.player2, 0), 0) != -1)) do
+        IO.puts("do stuff2")
+      end
+    end
     IO.puts("Stand!")
     IO.inspect(state)
     tempPlayerTurn = nextTurn(state.playerTurn)

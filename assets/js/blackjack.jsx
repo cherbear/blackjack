@@ -10,6 +10,10 @@ class Blackjack extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      prevPlayer1: [],
+      prevPlayer2: [],
+      prevPlayer1Sum: [],
+      prevPlayer2Sum: [],
       playerTurn: 1,
       player1: [],
       player1Name: "",
@@ -36,11 +40,27 @@ class Blackjack extends React.Component {
 
   hit() {
     console.log("Hit Pressed")
+    if (this.state.playerTurn === 2 && this.state.player2Sum > 21) {
+      this.setState({
+        prevPlayer1: this.state.player1,
+        prevPlayer2: this.state.player2,
+        prevPlayer1Sum: this.state.player1Sum,
+        prevPlayer2Sum: this.state.player2Sum,
+      })
+    }
     this.channel.push("hit").receive("ok", this.updateState.bind(this))
   }
 
   stand() {
     console.log("Stand Pressed")
+    if (this.state.playerTurn === 2) {
+      this.setState({
+        prevPlayer1: this.state.player1,
+        prevPlayer2: this.state.player2,
+        prevPlayer1Sum: this.state.player1Sum,
+        prevPlayer2Sum: this.state.player2Sum,
+      })
+    }
     this.channel.push("stand").receive("ok", this.updateState.bind(this))
   }
 
@@ -72,6 +92,33 @@ class Blackjack extends React.Component {
     } else if (this.state.playerTurn == 2) {
       p2handMessage = "P2-hand-turn"
     }
+    let prevP1handMessage = "prev-P1-hand";
+    let prevP2handMessage = "prev-P2-hand";
+    if (this.state.prevPlayer1Sum > 21) {
+      if (this.state.prevPlayer2Sum > 21) {
+        prevP1handMessage = "prev-P1-hand-bust";
+        prevP2handMessage = "prev-P2-hand-bust";
+      } else {
+        prevP1handMessage = "prev-P1-hand-bust";
+        prevP2handMessage = "prev-P2-hand-win";
+      }
+    } else if (this.state.prevPlayer2Sum > 21) {
+      if (this.state.prevPlayer1Sum > 21) {
+        prevP1handMessage = "prev-P1-hand-bust";
+        prevP2handMessage = "prev-P2-hand-bust";
+      } else {
+        prevP1handMessage = "prev-P1-hand-win";
+        prevP2handMessage = "prev-P2-hand-bust";
+      }
+    } else if (this.state.prevPlayer1Sum > this.state.prevPlayer2Sum) {
+      prevP1handMessage = "prev-P1-hand-win";
+    } else if (this.state.prevPlayer2Sum > this.state.prevPlayer1Sum) {
+      prevP2handMessage = "prev-P2-hand-win";
+    } else {
+      prevP1handMessage = "prev-P1-hand-tie";
+      prevP2handMessage = "prev-P2-hand-tie";
+    }
+
     return(
 	<div className="BlackjackGame">
     <div className="round">
@@ -97,6 +144,16 @@ class Blackjack extends React.Component {
         {this.state.player2.map((c) => {return <span className="P2-card">{c}</span>})}
         <p className="player-name">{this.state.player2Name}</p>
         <p className="score">Score: {this.state.player2Score}</p>
+	    </div>
+    </div>
+    <div className="row">
+	    <div className={prevP1handMessage}>
+        {this.state.prevPlayer1.map((c) => {return <span className="P1-card">{c}</span>})}
+        <p>Total: {this.state.prevPlayer1Sum}</p>
+	    </div>
+	    <div className={prevP2handMessage}>
+        {this.state.prevPlayer2.map((c) => {return <span className="P2-card">{c}</span>})}
+        <p>Total: {this.state.prevPlayer2Sum}</p>
 	    </div>
     </div>
 	  <div className="reset">
