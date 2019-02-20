@@ -38,10 +38,12 @@ defmodule BlackjackWeb.GamesChannel do
     game = %{
       player1: payload["player1"],
       player1Name: payload["player1Name"],
+      prevPlayer1Sum: payload["prevPlayer1Sum"],
       player1Sum: payload["player1Sum"],
       player1Score: payload["player1Score"],
       player2: payload["player2"],
       player2Name: payload["player2Name"],
+      prevPlayer2Sum: payload["prevPlayer2Sum"],
       player2Sum: payload["player2Sum"],
       player2Score: payload["player2Score"],
       playerTurn: payload["playerTurn"],

@@ -35,7 +35,7 @@ defmodule Blackjack.Game do
       }
   end
 
-  def newRound(state, p1Score, p2Score) do
+  def newRound(state, p1Score, p2Score, prevPlayer1Sum, prevPlayer2Sum) do
     deck = Enum.shuffle(state.deck ++ state.discard)
     p1Card1 = elem(List.pop_at(deck, 0), 0)
     p1Card2 = elem(List.pop_at(deck, 2), 0)
@@ -51,10 +51,12 @@ defmodule Blackjack.Game do
         discard: [p1Card1] ++ [p2Card2] ++ [p1Card2] ++ [p2Card2],
         player1: tempPlayer1,
         player1Name: "Player1",
+        prevPlayer1Sum: prevPlayer1Sum,
         player1Sum: tempPlayer1Sum,
         player1Score: p1Score,
         player2: tempPlayer2,
         player2Name: "Player2",
+        prevPlayer2Sum: prevPlayer2Sum,
         player2Sum: tempPlayer2Sum,
         player2Score: p2Score,
         playerTurn: 1,
@@ -85,10 +87,9 @@ defmodule Blackjack.Game do
     end
   end
 
-  def hit(state) do
-    if state.playerTurn == 1 do
-      IO.puts(state.player1)
-      if state.player1Sum > 21 do
+  def bust(state, op) do
+    cond do
+      state.playerTurn == 1 ->
         if elem(findAce(state.player1, 0), 0) != -1 do
           aceIndex = findAce(state.player1, 0)
           newPlayer1 = List.replace_at(state.player1, elem(aceIndex, 0), Enum.join(["1", elem(aceIndex, 1)], ""))
@@ -109,11 +110,51 @@ defmodule Blackjack.Game do
             win: state.win,
             name: state.name,
           }
-          hit(newState)
+          cond do
+            op == "hit" -> hit(newState)
+            op == "stand" -> stand(newState)
+          end
         else
           stand(state)
         end
-      else
+      state.playerTurn == 2 ->
+        if elem(findAce(state.player2, 0), 0) != -1 do
+          aceIndex = findAce(state.player2, 0)
+          newPlayer2 = List.replace_at(state.player2, elem(aceIndex, 0), Enum.join(["1", elem(aceIndex, 1)], ""))
+          totalPlayer2 = calcHand(newPlayer2)
+          newState = %{
+            deck: state.deck,
+            discard: state.discard,
+            player1: state.player1,
+            player1Name: state.player1Name,
+            player1Sum: state.player1Sum,
+            player1Score: state.player1Score,
+            player2: newPlayer2,
+            player2Name: state.player2Name,
+            player2Sum: totalPlayer2,
+            player2Score: state.player2Score,
+            playerTurn: state.playerTurn,
+            round: state.round,
+            win: state.win,
+            name: state.name,
+          }
+          cond do
+            op == "hit" -> hit(newState)
+            op == "stand" -> stand(newState)
+          end
+        else
+          stand(state)
+        end
+    end
+  end
+
+  def hit(state) do
+    cond do
+      calcHand(state.player1) > 21 && state.playerTurn == 1 -> bust(state, "hit")
+      calcHand(state.player2) > 21 && state.playerTurn == 2 -> bust(state, "hit")
+      true ->
+    if state.playerTurn == 1 do
+      IO.puts(state.player1)
         newCard = elem(List.pop_at(state.deck, 0), 0)
         tempDeck = elem(List.pop_at(state.deck, 0), 1)
         tempDiscard = state.discard ++ [newCard]
@@ -136,35 +177,8 @@ defmodule Blackjack.Game do
           win: state.win,
           name: state.name,
         }
-      end
     else
       IO.puts(state.player2)
-      if state.player2Sum > 21 do
-        if elem(findAce(state.player2, 0), 0) != -1 do
-          aceIndex = findAce(state.player2, 0)
-          newPlayer2 = List.replace_at(state.player2, elem(aceIndex, 0), Enum.join(["1", elem(aceIndex, 1)], ""))
-          totalPlayer2 = calcHand(newPlayer2)
-          newState = %{
-            deck: state.deck,
-            discard: state.discard,
-            player1: state.player1,
-            player1Name: state.player1Name,
-            player1Sum: state.player1Sum,
-            player1Score: state.player1Score,
-            player2: newPlayer2,
-            player2Name: state.player2Name,
-            player2Sum: totalPlayer2,
-            player2Score: state.player2Score,
-            playerTurn: state.playerTurn,
-            round: state.round,
-            win: state.win,
-            name: state.name,
-          }
-          hit(newState)
-        else
-          stand(state)
-        end
-      else
         newCard = elem(List.pop_at(state.deck, 0), 0)
         tempDeck = elem(List.pop_at(state.deck, 0), 1)
         tempDiscard = state.discard ++ [newCard]
@@ -187,7 +201,7 @@ defmodule Blackjack.Game do
           win: state.win,
           name: state.name,
         }
-      end
+    end
     end
   end
 
@@ -201,6 +215,8 @@ defmodule Blackjack.Game do
   def calcScores(state) do
     if state.playerTurn == 2  do
       cond do
+        Enum.member?(state.player1, "AS") && (Enum.member?(state.player1, "JS") || Enum.member?(state.player1, "JC")) && length(state.player1) == 2 -> {state.player1Score + 3, state.player2Score, true}
+        Enum.member?(state.player2, "AS") && (Enum.member?(state.player2, "JS") || Enum.member?(state.player2, "JC")) && length(state.player2) == 2 -> {state.player1Score, state.player2Score + 3, true}
         state.player1Sum > 21 && state.player2Sum > 21 -> {state.player1Score, state.player2Score, true}
         state.player1Sum > 21 && state.player2Sum < 21 -> {state.player1Score, state.player2Score + 1, true}
         state.player2Sum > 21 && state.player1Sum < 21 -> {state.player1Score + 1, state.player2Score, true}
@@ -215,13 +231,10 @@ defmodule Blackjack.Game do
   end
 
   def stand(state) do
-    if((state.player1Sum > 21) && (elem(findAce(state.player1, 0), 0) != -1)) do
-      IO.puts("do stuff1")
-    else
-      if ((state.player2Sum > 21) && (elem(findAce(state.player2, 0), 0) != -1)) do
-        IO.puts("do stuff2")
-      end
-    end
+    cond do
+      calcHand(state.player1) > 21 && state.playerTurn == 1 && elem(findAce(state.player1, 0), 0) != -1 -> bust(state, "stand")
+      calcHand(state.player2) > 21 && state.playerTurn == 2 && elem(findAce(state.player2, 0), 0) != -1 -> bust(state, "stand")
+      true ->
     IO.puts("Stand!")
     IO.inspect(state)
     tempPlayerTurn = nextTurn(state.playerTurn)
@@ -229,7 +242,11 @@ defmodule Blackjack.Game do
     p1Score = elem(scores, 0)
     p2Score = elem(scores, 1)
     if elem(scores, 2) do
-      newRound(state, p1Score, p2Score)
+      prevPlayer1Sum = calcHand(state.player1)
+      prevPlayer2Sum = calcHand(state.player2)
+      IO.puts(prevPlayer1Sum)
+      IO.puts(prevPlayer2Sum)
+      newRound(state, p1Score, p2Score, prevPlayer1Sum, prevPlayer2Sum)
     else
     %{
       deck: state.deck,
@@ -247,6 +264,7 @@ defmodule Blackjack.Game do
       win: state.win,
       name: state.name,
     }
+    end
     end
   end
 end
