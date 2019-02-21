@@ -7,6 +7,42 @@
     text-align: center;
 }
 
+.hit {
+    background-color: lightgreen;
+    border-color: green;
+    border-width: 2px;
+    color: green;
+}
+
+.hit-fake {
+    background-color: crimson;
+    border-color: red;
+    border-width: 2px;
+    color: green;
+}
+
+.stand {
+    background-color: lightgreen;
+    border-color: green;
+    border-width: 2px;
+    color: green;
+}
+
+.stand-fake {
+    background-color: crimson;
+    border-color: red;
+    border-width: 2px;
+    color: green;
+}
+
+.turn {
+    font-weight: bold;
+}
+
+.player-name {
+    font-weight: bold;
+}
+
 .prev-P1-hand-bust {
     font-family: Monospace;
     font-size: 25px;

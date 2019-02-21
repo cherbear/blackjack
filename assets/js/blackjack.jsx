@@ -31,6 +31,7 @@ class Blackjack extends React.Component {
     this.channel.join()
 	  .receive("ok", this.updateState.bind(this))
 	  .receive("error", resp => {console.log("Failed to join game", resp)});
+    this.channel.on("update", this.updateState.bind(this))
   }
 
   resetGame() {
@@ -66,7 +67,6 @@ class Blackjack extends React.Component {
 
   updateState(state) {
     console.log("Update State")
-    console.log(state.game.playerTurn)
     console.log(state.game.player1)
     console.log(state.game.player1Sum)
     console.log(state.game.player2)
@@ -81,7 +81,13 @@ class Blackjack extends React.Component {
       turnMessage = this.state.player2Name + "'s Turn";
     }
     if (this.state.win) {
-      turnMessage = "Player X Won this Round!";
+      if (this.state.player1Score > this.state.player2Score) {
+        turnMessage = this.state.player1Name + " won the game!";
+      } else if (this.state.player2Score > this.state.player1Score) {
+        turnMessage = this.state.player2Name + " won the game!";
+      } else {
+        turnMessage = "It's a tie!"
+      }
     }
     let roundMessage = "Round: " + this.state.round;
     let scoreMessage = this.state.player1Name + " Score: " + this.state.player1Score + "    ||    " + this.state.player2Name + " Score: " + this.state.player2Score
@@ -118,6 +124,37 @@ class Blackjack extends React.Component {
       prevP1handMessage = "prev-P1-hand-tie";
       prevP2handMessage = "prev-P2-hand-tie";
     }
+    
+    let player = 0;
+    if (window.userName == this.state.player1Name) {
+      player = 1;
+    } else if (window.userName == this.state.player2Name) {
+      player = 2;
+    } else {
+      player = -1
+    }
+
+    let buttons;
+    if (player == this.state.playerTurn && !this.state.win) {
+      buttons =   
+      <div className="col">
+        <button className="hit" name="Hit" onClick={() => this.hit()}>Hit</button>
+        &nbsp;
+        <button className="stand" name="Stand" onClick={() => this.stand()}>Stand</button>
+      </div>
+    } else {
+      buttons = 
+      <div className="col">
+        <button className="hit-fake" name="Hit">Hit</button>
+        &nbsp;
+        <button className="stand-fake" name="Stand">Stand</button>
+      </div>
+    }
+
+    let reset;
+    if (this.state.win) {
+	    reset = <button className="reset-button" name="Reset" onClick={() => this.resetGame()}>Reset Game</button>
+    }
 
     return(
 	<div className="BlackjackGame">
@@ -128,11 +165,7 @@ class Blackjack extends React.Component {
 	    {turnMessage}
 	  </div>
     <div className="buttons">
-      <div className="col">
-        <button className="hit" name="Hit" onClick={() => this.hit()}>Hit</button>
-        &nbsp;
-        <button className="stand" name="Stand" onClick={() => this.stand()}>Stand</button>
-      </div>
+      {buttons}
     </div>
     <div className="row">
 	    <div className={p1handMessage}>
@@ -157,8 +190,8 @@ class Blackjack extends React.Component {
 	    </div>
     </div>
 	  <div className="reset">
-	    <button className="reset-button" name="Reset" onClick={() => this.resetGame()}>Reset Game</button>
-	  </div>
+	    {reset}
+    </div>
 	</div>
     );
   }

@@ -3,11 +3,15 @@ defmodule BlackjackWeb.GamesChannel do
   alias Blackjack.Game
   alias Blackjack.BackupAgent
 
+  intercept ["update"]
+
   def join("games:" <> game_name, %{"user" => user}, socket) do
     IO.puts("NAME #{user}")
     if authorized?(user) do
-      #IO.puts(BackupAgent.get(game_name))
+      IO.puts("Joining...")
       game = BackupAgent.get(game_name) || Game.new(game_name)
+      game = Game.userJoin(game, user)
+      IO.inspect(game)
       socket = socket
       |> assign(:game, game_name)
       |> assign(:user, user)
@@ -23,6 +27,7 @@ defmodule BlackjackWeb.GamesChannel do
     game = BackupAgent.get(game_name)
     |> Game.hit
     BackupAgent.put(game_name, game)
+    broadcast!(socket, "update", %{game: game})
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
@@ -31,10 +36,12 @@ defmodule BlackjackWeb.GamesChannel do
     game = BackupAgent.get(game_name)
     |> Game.stand
     BackupAgent.put(game_name, game)
+    broadcast!(socket, "update", %{game: game})
     {:reply, {:ok, %{"game" => game}}, socket}
   end
   
   def handle_in("update", payload, socket) do
+    IO.puts("Handling In! Update!")
     game = %{
       player1: payload["player1"],
       player1Name: payload["player1Name"],
@@ -51,15 +58,24 @@ defmodule BlackjackWeb.GamesChannel do
       name: payload["name"],
       win: payload["win"],
     }
+    IO.puts("handle_in_broadcast_1")
+    broadcast!(socket, "update", %{game: game})
+    IO.puts("handle_in_broadcast_2")
     BackupAgent.put(socket.assigns[:game], game)
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
 
+  def handle_out("update", payload, socket) do
+    IO.puts("Handling Out! Update!")
+    push(socket, "update", payload)
+    {:noreply, socket}
+  end
+
   def handle_in("new", payload, socket) do
     game_name = socket.assigns[:game]
     game = BackupAgent.get(game_name)
-    |> Game.new
+    game = Game.new(game, game.player1Name, game.player2Name)
     BackupAgent.put(game_name, game)
     {:reply, {:ok, %{"game" => game}}, socket}
   end
