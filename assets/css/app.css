@@ -15,10 +15,10 @@
 }
 
 .hit-fake {
-    background-color: crimson;
+    background-color: salmon;
     border-color: red;
     border-width: 2px;
-    color: green;
+    color: red;
 }
 
 .stand {
@@ -29,10 +29,10 @@
 }
 
 .stand-fake {
-    background-color: crimson;
+    background-color: salmon;
     border-color: red;
     border-width: 2px;
-    color: green;
+    color: red;
 }
 
 .turn {
@@ -136,7 +136,7 @@
     font-size: 50px;
     text-align: center;
     color: black;
-    border-width: medium;
+    border-width: 8px;
     border-style: solid;
     padding: 2px;
     margin: 2px;
@@ -147,7 +147,7 @@
     font-size: 50px;
     text-align: center;
     color: green;
-    border-width: medium;
+    border-width: 8px;
     border-style: solid;
     padding: 2px;
     margin: 2px;
@@ -158,7 +158,7 @@
     font-size: 50px;
     text-align: center;
     color: black;
-    border-width: medium;
+    border-width: 8px;
     border-style: solid;
     padding: 2px;
     margin: 2px;
@@ -169,7 +169,7 @@
     font-size: 50px;
     text-align: center;
     color: green;
-    border-width: medium;
+    border-width: 8px;
     border-style: solid;
     padding: 2px;
     margin: 2px;

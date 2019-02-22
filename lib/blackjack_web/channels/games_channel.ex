@@ -16,7 +16,8 @@ defmodule BlackjackWeb.GamesChannel do
       |> assign(:game, game_name)
       |> assign(:user, user)
       BackupAgent.put(game_name, game)
-      {:ok, %{"join" => game_name, "game" => game}, socket}
+      client_game = Game.clientView(game, socket.assigns[:user])
+      {:ok, %{"join" => game_name, "game" => client_game}, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
@@ -27,8 +28,9 @@ defmodule BlackjackWeb.GamesChannel do
     game = BackupAgent.get(game_name)
     |> Game.hit
     BackupAgent.put(game_name, game)
+    client_game = Game.clientView(game, socket.assigns[:user])
     broadcast!(socket, "update", %{game: game})
-    {:reply, {:ok, %{"game" => game}}, socket}
+    {:reply, {:ok, %{"game" => client_game}}, socket}
   end
 
   def handle_in("stand", payload, socket) do
@@ -36,8 +38,9 @@ defmodule BlackjackWeb.GamesChannel do
     game = BackupAgent.get(game_name)
     |> Game.stand
     BackupAgent.put(game_name, game)
+    client_game = Game.clientView(game, socket.assigns[:user])
     broadcast!(socket, "update", %{game: game})
-    {:reply, {:ok, %{"game" => game}}, socket}
+    {:reply, {:ok, %{"game" => client_game}}, socket}
   end
   
   def handle_in("update", payload, socket) do
@@ -46,21 +49,21 @@ defmodule BlackjackWeb.GamesChannel do
       player1: payload["player1"],
       player1Name: payload["player1Name"],
       prevPlayer1Sum: payload["prevPlayer1Sum"],
-      player1Sum: payload["player1Sum"],
       player1Score: payload["player1Score"],
       player2: payload["player2"],
       player2Name: payload["player2Name"],
       prevPlayer2Sum: payload["prevPlayer2Sum"],
-      player2Sum: payload["player2Sum"],
       player2Score: payload["player2Score"],
       playerTurn: payload["playerTurn"],
       round: payload["round"],
       name: payload["name"],
       win: payload["win"],
+      prevPlayer1: payload["prevPlayer1"],
+      prevPlayer2: payload["prevPlayer2"],
+      prevPlayer1Sum: payload["prevPlayer1Sum"],
+      prevPlayer2Sum: payload["prevPlayer2Sum"],
     }
-    IO.puts("handle_in_broadcast_1")
     broadcast!(socket, "update", %{game: game})
-    IO.puts("handle_in_broadcast_2")
     BackupAgent.put(socket.assigns[:game], game)
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{"game" => game}}, socket}
@@ -68,7 +71,12 @@ defmodule BlackjackWeb.GamesChannel do
 
   def handle_out("update", payload, socket) do
     IO.puts("Handling Out! Update!")
-    push(socket, "update", payload)
+    game_name = socket.assigns[:game]
+    game = BackupAgent.get(game_name)
+    client_game = Game.clientView(game, socket.assigns[:user])
+    IO.puts("Handling Out! Update! Flag 0")
+    push(payload, "update", client_game)
+    IO.puts("Handling Out! Update! Flag 1")
     {:noreply, socket}
   end
 

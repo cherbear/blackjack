@@ -17,11 +17,9 @@ class Blackjack extends React.Component {
       playerTurn: 1,
       player1: [],
       player1Name: "",
-      player1Sum: 0,
       player1Score: 0,
       player2: [],
       player2Name: "",
-      player2Sum: 0,
       player2Score: 0,
       win: false,
       round: 1,
@@ -41,39 +39,23 @@ class Blackjack extends React.Component {
 
   hit() {
     console.log("Hit Pressed")
-    if (this.state.playerTurn === 2 && this.state.player2Sum > 21) {
-      this.setState({
-        prevPlayer1: this.state.player1,
-        prevPlayer2: this.state.player2,
-        prevPlayer1Sum: this.state.player1Sum,
-        prevPlayer2Sum: this.state.player2Sum,
-      })
-    }
     this.channel.push("hit").receive("ok", this.updateState.bind(this))
   }
 
   stand() {
     console.log("Stand Pressed")
-    if (this.state.playerTurn === 2) {
-      this.setState({
-        prevPlayer1: this.state.player1,
-        prevPlayer2: this.state.player2,
-        prevPlayer1Sum: this.state.player1Sum,
-        prevPlayer2Sum: this.state.player2Sum,
-      })
-    }
     this.channel.push("stand").receive("ok", this.updateState.bind(this))
   }
 
   updateState(state) {
     console.log("Update State")
-    console.log(state.game.player1)
-    console.log(state.game.player1Sum)
-    console.log(state.game.player2)
-    console.log(state.game.player2Sum)
     this.setState(state.game);
   }
   render() {
+    let spectating = "";
+    if (window.userName != this.state.player1Name && window.userName != this.state.player2Name) {
+      spectating = "(" + "You are spectating " + this.state.player1Name + " and " + this.state.player2Name + ")";
+    }
     let turnMessage = "Turn Message";
     if (this.state.playerTurn == 1) {
       turnMessage = this.state.player1Name + "'s Turn";
@@ -158,6 +140,7 @@ class Blackjack extends React.Component {
 
     return(
 	<div className="BlackjackGame">
+      {spectating}
     <div className="round">
       {roundMessage}
     </div>

@@ -42,6 +42,10 @@ defmodule Blackjack.Game do
         round: 1,
         win: false,
         name: name,
+        prevPlayer1: [],
+        prevPlayer2: [],
+        prevPlayer1Sum: 0,
+        prevPlayer2Sum: 0, 
       }
   end
 
@@ -72,6 +76,10 @@ defmodule Blackjack.Game do
         round: 1,
         win: false,
         name: name,
+        prevPlayer1: [],
+        prevPlayer2: [],
+        prevPlayer1Sum: 0,
+        prevPlayer2Sum: 0, 
       }
   end
   
@@ -95,6 +103,10 @@ defmodule Blackjack.Game do
             round: state.round,
             win: state.win,
             name: state.name,
+            prevPlayer1: state.prevPlayer1,
+            prevPlayer2: state.prevPlayer2,
+            prevPlayer1Sum: state.prevPlayer1Sum,
+            prevPlayer2Sum: state.prevPlayer2Sum,
           }
       state.player2Name == "Player2" && user != state.player1Name ->
           %{
@@ -114,11 +126,76 @@ defmodule Blackjack.Game do
             round: state.round,
             win: state.win,
             name: state.name,
+            prevPlayer1: state.prevPlayer1,
+            prevPlayer2: state.prevPlayer2,
+            prevPlayer1Sum: state.prevPlayer1Sum,
+            prevPlayer2Sum: state.prevPlayer2Sum,
           }
-      true -> state
+      true -> state #For spectators
     end
   end
 
+  def hideCards(cards) do
+    cond do
+      length(cards) == 0 -> []
+      true -> ["--"] ++ hideCards(tl(cards))
+    end
+  end
+
+  def clientView(state, user) do
+    cond do
+      user == state.player1Name ->
+          player2Hidden = hideCards(state.player2)
+          %{
+            deck: state.deck,
+            discard: state.discard,
+            player1: state.player1,
+            player1Name: state.player1Name,
+            player1Sum: state.player1Sum,
+            prevPlayer1Sum: state.prevPlayer1Sum,
+            player1Score: state.player1Score,
+            player2: player2Hidden,
+            player2Name: state.player2Name,
+            player2Sum: 0,
+            prevPlayer2Sum: state.prevPlayer2Sum,
+            player2Score: state.player2Score,
+            playerTurn: state.playerTurn,
+            round: state.round,
+            win: state.win,
+            name: state.name,
+            prevPlayer1: state.prevPlayer1,
+            prevPlayer2: state.prevPlayer2,
+            prevPlayer1Sum: state.prevPlayer1Sum,
+            prevPlayer2Sum: state.prevPlayer2Sum,
+          }
+      user == state.player2Name ->
+          player1Hidden = hideCards(state.player1)
+          %{
+            deck: state.deck,
+            discard: state.discard,
+            player1: player1Hidden,
+            player1Name: state.player1Name,
+            player1Sum: 0,
+            prevPlayer1Sum: state.prevPlayer1Sum,
+            player1Score: state.player1Score,
+            player2: state.player2,
+            player2Name: state.player2Name,
+            player2Sum: state.player2Sum,
+            prevPlayer2Sum: state.prevPlayer2Sum,
+            player2Score: state.player2Score,
+            playerTurn: state.playerTurn,
+            round: state.round,
+            win: state.win,
+            name: state.name,
+            prevPlayer1: state.prevPlayer1,
+            prevPlayer2: state.prevPlayer2,
+            prevPlayer1Sum: state.prevPlayer1Sum,
+            prevPlayer2Sum: state.prevPlayer2Sum,
+          }
+      true -> state #For spectators
+    end
+  end
+  
   def newRound(state, p1Score, p2Score, prevPlayer1Sum, prevPlayer2Sum, p1Name, p2Name) do
     deck = Enum.shuffle(state.deck ++ state.discard)
     p1Card1 = elem(List.pop_at(deck, 0), 0)
@@ -147,6 +224,10 @@ defmodule Blackjack.Game do
         round: state.round + 1,
         win: false,
         name: state.name,
+        prevPlayer1: state.player1,
+        prevPlayer2: state.player2,
+        prevPlayer1Sum: state.player1Sum,
+        prevPlayer2Sum: state.player2Sum,
       }
   end
 
@@ -195,6 +276,10 @@ defmodule Blackjack.Game do
             round: state.round,
             win: state.win,
             name: state.name,
+            prevPlayer1: state.prevPlayer1,
+            prevPlayer2: state.prevPlayer2,
+            prevPlayer1Sum: state.prevPlayer1Sum,
+            prevPlayer2Sum: state.prevPlayer2Sum,
           }
           cond do
             op == "hit" -> hit(newState)
@@ -225,6 +310,10 @@ defmodule Blackjack.Game do
             round: state.round,
             win: state.win,
             name: state.name,
+            prevPlayer1: state.prevPlayer1,
+            prevPlayer2: state.prevPlayer2,
+            prevPlayer1Sum: state.prevPlayer1Sum,
+            prevPlayer2Sum: state.prevPlayer2Sum,
           }
           cond do
             op == "hit" -> hit(newState)
@@ -242,7 +331,6 @@ defmodule Blackjack.Game do
       calcHand(state.player2) > 21 && state.playerTurn == 2 -> bust(state, "hit")
       true ->
     if state.playerTurn == 1 do
-      IO.puts(state.player1)
         newCard = elem(List.pop_at(state.deck, 0), 0)
         tempDeck = elem(List.pop_at(state.deck, 0), 1)
         tempDiscard = state.discard ++ [newCard]
@@ -266,9 +354,12 @@ defmodule Blackjack.Game do
           round: state.round,
           win: state.win,
           name: state.name,
+          prevPlayer1: state.prevPlayer1,
+          prevPlayer2: state.prevPlayer2,
+          prevPlayer1Sum: state.prevPlayer1Sum,
+          prevPlayer2Sum: state.prevPlayer2Sum,
         }
     else
-      IO.puts(state.player2)
         newCard = elem(List.pop_at(state.deck, 0), 0)
         tempDeck = elem(List.pop_at(state.deck, 0), 1)
         tempDiscard = state.discard ++ [newCard]
@@ -292,6 +383,10 @@ defmodule Blackjack.Game do
           round: state.round,
           win: state.win,
           name: state.name,
+          prevPlayer1: state.prevPlayer1,
+          prevPlayer2: state.prevPlayer2,
+          prevPlayer1Sum: state.prevPlayer1Sum,
+          prevPlayer2Sum: state.prevPlayer2Sum,
         }
     end
     end
@@ -328,7 +423,6 @@ defmodule Blackjack.Game do
       calcHand(state.player2) > 21 && state.playerTurn == 2 && elem(findAce(state.player2, 0), 0) != -1 -> bust(state, "stand")
       true ->
     IO.puts("Stand!")
-    IO.inspect(state)
     tempPlayerTurn = nextTurn(state.playerTurn)
     scores = calcScores(state)
     p1Score = elem(scores, 0)
@@ -336,8 +430,6 @@ defmodule Blackjack.Game do
     if elem(scores, 2) do
       prevPlayer1Sum = calcHand(state.player1)
       prevPlayer2Sum = calcHand(state.player2)
-      IO.puts(prevPlayer1Sum)
-      IO.puts(prevPlayer2Sum)
       if p1Score >= 5 || p2Score >= 5 do
         %{
           deck: state.deck,
@@ -356,6 +448,10 @@ defmodule Blackjack.Game do
           round: state.round,
           win: true,
           name: state.name,
+          prevPlayer1: state.prevPlayer1,
+          prevPlayer2: state.prevPlayer2,
+          prevPlayer1Sum: state.prevPlayer1Sum,
+          prevPlayer2Sum: state.prevPlayer2Sum,
         } 
       else
         newRound(state, p1Score, p2Score, prevPlayer1Sum, prevPlayer2Sum, state.player1Name, state.player2Name)
@@ -378,6 +474,10 @@ defmodule Blackjack.Game do
       round: state.round,
       win: state.win,
       name: state.name,
+      prevPlayer1: state.prevPlayer1,
+      prevPlayer2: state.prevPlayer2,
+      prevPlayer1Sum: state.prevPlayer1Sum,
+      prevPlayer2Sum: state.prevPlayer2Sum,
     }
     end
     end
