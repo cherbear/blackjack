@@ -221,3 +221,8 @@
 .player-name {
     margin-bottom: 0px;
 }
+
+img.card {
+    max-width:80px;
+    max-height:200px;
+}
