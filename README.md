@@ -1,5 +1,10 @@
 # Blackjack
 
+Card images and background green pattern obtained from the American Contract Bridge League. Files downloaded from the following two urls:
+http://acbl.mybigcommerce.com/52-playing-cards/
+http://acbl.mybigcommerce.com/simple-green-theme-materials/
+
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`

@@ -748,6 +748,7 @@ img {
     border-style: solid;
     padding: 2px;
     margin: 2px;
+
 }
 
 .P2-card {
@@ -782,5 +783,10 @@ img {
 
 .player-name {
     margin-bottom: 0px;
+}
+
+img.resize {
+  max-width:30%;
+  max-height:30%;
 }
 

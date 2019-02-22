@@ -136,23 +136,23 @@ class Blackjack extends React.Component {
     </div>
     <div className="row">
 	    <div className={p1handMessage}>
-        {this.state.player1.map((c) => {return <span className="P1-card">{c}</span>})}
+        {this.state.player1.map((c) => <img className="resize" src={"/images/"+c+".png"}/>)}
         <p className="player-name">{this.state.player1Name}</p>
         <p className="score">Score: {this.state.player1Score}</p>
 	    </div>
 	    <div className={p2handMessage}>
-        {this.state.player2.map((c) => {return <span className="P2-card">{c}</span>})}
+        {this.state.player2.map((c) => <img className="resize" src={"/images/"+c+".png"}/>)}
         <p className="player-name">{this.state.player2Name}</p>
         <p className="score">Score: {this.state.player2Score}</p>
 	    </div>
     </div>
     <div className="row">
 	    <div className={prevP1handMessage}>
-        {this.state.prevPlayer1.map((c) => {return <span className="P1-card">{c}</span>})}
+        {this.state.prevPlayer1.map((c) => <img className="resize" src={"/images/"+c+".png"}/>)}
         <p>Total: {this.state.prevPlayer1Sum}</p>
 	    </div>
 	    <div className={prevP2handMessage}>
-        {this.state.prevPlayer2.map((c) => {return <span className="P2-card">{c}</span>})}
+        {this.state.prevPlayer2.map((c) => <img className="resize" src={"/images/"+c+".png"}/>)}
         <p>Total: {this.state.prevPlayer2Sum}</p>
 	    </div>
     </div>
